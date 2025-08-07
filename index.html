@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>I miei animali Preferiti</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script type="text/babel">
+      const animalsChoices = [
+        "Cane",
+        "Gatto",
+        "Pappagallo",
+        "Cavallo",
+        "Panda",
+      ];
+
+      function Modal({ title, show = false, onClose = () => {}, onAddAnimal }) {
+        const [input, setInput] = React.useState("");
+        function handleSubmit(e) {
+          e.preventDefault();
+          if (input.trim()) {
+            onAddAnimal(input.trim());
+            setInput("");
+            onClose();
+          }
+        }
+        return (
+          show &&
+          ReactDOM.createPortal(
+            <div className="modal-container">
+              <div className="modal">
+                <h2>{title}</h2>
+                <form onSubmit={handleSubmit}>
+                  <input
+                    type="text"
+                    placeholder="Nome animale"
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    autoFocus
+                  />
+                  <button type="submit">Aggiungi</button>
+                  <button type="button" onClick={onClose}>
+                    Annulla
+                  </button>
+                </form>
+              </div>
+            </div>,
+            document.body
+          )
+        );
+      }
+
+      function GetMessage() {
+        const [show, setShow] = React.useState(false);
+        const [animals, setAnimals] = React.useState([]);
+        function adderAnimalRandom() {
+          const available = animalsChoices.filter((a) => !animals.includes(a));
+          if (available.length === 0) return;
+          const next = available[Math.floor(Math.random() * available.length)];
+          setAnimals([...animals, next]);
+        }
+        function adderAnimalByName(name) {
+          if (!animals.includes(name)) {
+            setAnimals([...animals, name]);
+          }
+        }
+        return (
+          <>
+            <button onClick={adderAnimalRandom}>Add Animal Random</button>
+            <button onClick={() => setShow(true)}>Aggiungi Animale</button>
+            <Modal
+              title="Aggiungi un animale"
+              show={show}
+              onClose={() => setShow(false)}
+              onAddAnimal={adderAnimalByName}
+            />
+            <details>
+              <summary>Animali</summary>
+              <ul>
+                {animals.map((animal, idx) => (
+                  <li key={idx}>{animal}</li>
+                ))}
+              </ul>
+            </details>
+          </>
+        );
+      }
+
+      ReactDOM.createRoot(document.getElementById("lista-animali")).render(
+        <GetMessage />
+      );
+    </script>
+    <style>
+      .modal-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.75);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .modal {
+        background-color: white;
+        padding: 20px;
+        border-radius: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>I miei animali Preferiti</h1>
+    </header>
+    <main>
+      <figure>
+        <img src="https://picsum.photos/400/300" alt="Immagine Casuale" />
+      </figure>
+      <div id="lista-animali"></div>
+    </main>
+    <footer>
+      <p>Creato con amore da... un collega sbadato! 🐾</p>
+    </footer>
+  </body>
+</html>
