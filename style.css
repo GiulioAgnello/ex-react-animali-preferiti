@@ -59,3 +59,15 @@ button {
   color: white;
   border: none;
 }
+
+.card {
+  display: flex;
+  background-color: aquamarine;
+  padding: 20px;
+  border-radius: 5px;
+  margin-top: 10px;
+}
+
+.card img {
+  width: 500px;
+}

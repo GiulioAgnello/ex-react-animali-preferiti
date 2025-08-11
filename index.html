@@ -57,30 +57,42 @@
         const [show, setShow] = React.useState(false);
         const [animals, setAnimals] = React.useState([]);
         const [isLoading, setIsLoading] = React.useState(false);
+
         function adderAnimalRandom() {
-          const available = animalsChoices.filter((a) => !animals.includes(a));
+          const available = animalsChoices.filter(
+            (a) => !animals.some((animal) => animal.name === a)
+          );
           if (available.length === 0) return;
           const next = available[Math.floor(Math.random() * available.length)];
-          setAnimals([...animals, next]);
+          setAnimals([...animals, { name: next }]);
         }
+
         async function adderAnimalByName(name) {
-          if (!animals.includes(name)) {
+          if (!animals.some((animal) => animal.name === name)) {
             setIsLoading(true);
             try {
               const response = await fetch(
-                `http://localhost:3333/animals?search=${animals}`
+                `http://localhost:3333/animals?search=${name}`
               );
-              const [animal] = await response.json();
-              if (!animal) {
+              const [animalData] = await response.json();
+              if (!animalData) {
                 throw new Error(`animale non trovato`);
               }
-              console.log(animal);
+              const animal = {
+                name: animalData.name || null,
+                description: animalData.description || null,
+                image: animalData.image || null,
+              };
+              setAnimals([...animals, animal]);
             } catch (err) {
               console.error(err);
+            } finally {
+              setShow(false);
+              setIsLoading(false);
             }
-            // setAnimals([...animals, name]);
           }
         }
+
         return (
           <>
             <button onClick={adderAnimalRandom}>Add Animal Random</button>
@@ -93,11 +105,21 @@
             />
             <details>
               <summary>Animali</summary>
-              <ul>
+              <div>
                 {animals.map((animal, idx) => (
-                  <li key={idx}>{animal}</li>
+                  <div key={idx} className="card">
+                    <div>
+                      <h3>{animal.name}</h3>
+                      <p>{animal.description}</p>
+                    </div>
+                    {animal.image && (
+                      <figure>
+                        <img src={animal.image} alt={animal.name} />
+                      </figure>
+                    )}
+                  </div>
                 ))}
-              </ul>
+              </div>
             </details>
           </>
         );
