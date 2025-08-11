@@ -56,15 +56,29 @@
       function GetMessage() {
         const [show, setShow] = React.useState(false);
         const [animals, setAnimals] = React.useState([]);
+        const [isLoading, setIsLoading] = React.useState(false);
         function adderAnimalRandom() {
           const available = animalsChoices.filter((a) => !animals.includes(a));
           if (available.length === 0) return;
           const next = available[Math.floor(Math.random() * available.length)];
           setAnimals([...animals, next]);
         }
-        function adderAnimalByName(name) {
+        async function adderAnimalByName(name) {
           if (!animals.includes(name)) {
-            setAnimals([...animals, name]);
+            setIsLoading(true);
+            try {
+              const response = await fetch(
+                `http://localhost:3333/animals?search=${animals}`
+              );
+              const [animal] = await response.json();
+              if (!animal) {
+                throw new Error(`animale non trovato`);
+              }
+              console.log(animal);
+            } catch (err) {
+              console.error(err);
+            }
+            // setAnimals([...animals, name]);
           }
         }
         return (
